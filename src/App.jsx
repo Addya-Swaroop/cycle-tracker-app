@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import DailyJournal from "./components/DailyJournal";
 import CycleCalendar from "./components/CycleCalendar";
+import InsightsDashboard from "./components/InsightsDashboard";
 import "./App.css";
 
 function App() {
@@ -107,6 +108,14 @@ function App() {
         >
           Daily Journal
         </button>
+
+        <button
+          type="button"
+          className={page === "insights" ? "active" : ""}
+          onClick={() => navigateTo("insights")}
+        >
+          Insights
+        </button>
       </nav>
 
       {page === "journal" ? (
@@ -116,6 +125,8 @@ function App() {
         />
       ) : page === "calendar" ? (
         <CycleCalendar onOpenJournal={openJournal} />
+      ) : page === "insights" ? (
+        <InsightsDashboard />
       ) : (
         <>
           <section className="panel">

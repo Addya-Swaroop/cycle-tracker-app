@@ -1,35 +1,25 @@
 
 import { useEffect, useMemo, useState } from "react";
+import {
+  addDays,
+  daysBetween,
+  localToday,
+  formatDate,
+  calculatePrediction,
+} from "../utils/cyclePrediction";
 import "./CycleCalendar.css";
 
-const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const WEEKDAYS = [
+  "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
+];
 
-function toDateKey(date) {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
-}
-
-function parseDate(key) {
+function parseLocalDate(key) {
   const [y, m, d] = key.split("-").map(Number);
   return new Date(y, m - 1, d);
 }
 
-function addDays(key, amount) {
-  const date = parseDate(key);
-  date.setDate(date.getDate() + amount);
-  return toDateKey(date);
-}
-
-function dayDifference(start, end) {
-  const a = Date.parse(`${start}T00:00:00Z`);
-  const b = Date.parse(`${end}T00:00:00Z`);
-  return Math.round((b - a) / 86400000);
-}
-
 function readableDate(key) {
-  return parseDate(key).toLocaleDateString("en-IN", {
+  return parseLocalDate(key).toLocaleDateString("en-IN", {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -37,52 +27,119 @@ function readableDate(key) {
 }
 
 function buildCalendar(year, month) {
-  const firstDay = new Date(year, month, 1).getDay();
+  const firstWeekday = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const totalCells = Math.ceil((firstDay + daysInMonth) / 7) * 7;
 
-  return Array.from({ length: totalCells }, (_, index) => {
-    const date = new Date(year, month, index - firstDay + 1);
+  const total = Math.ceil(
+    (firstWeekday + daysInMonth) / 7
+  ) * 7;
+
+  return Array.from({ length: total }, (_, index) => {
+    const date = new Date(
+      year,
+      month,
+      index - firstWeekday + 1
+    );
+
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
 
     return {
-      key: toDateKey(date),
+      key: `${y}-${m}-${d}`,
       day: date.getDate(),
-      currentMonth: date.getMonth() === month &&
+      currentMonth:
+        date.getMonth() === month &&
         date.getFullYear() === year,
     };
   });
 }
 
-export default function CycleCalendar({ onOpenJournal }) {
-  const [viewDate, setViewDate] = useState(() => new Date());
-  const [selectedDate, setSelectedDate] = useState(() =>
-    toDateKey(new Date())
+function getPeriodDays(cycles) {
+  const days = new Set();
+
+  for (const cycle of cycles) {
+    if (!cycle.end_date) {
+      days.add(cycle.start_date);
+      continue;
+    }
+
+    const duration = daysBetween(
+      cycle.start_date,
+      cycle.end_date
+    );
+
+    if (duration < 0 || duration > 30) {
+      days.add(cycle.start_date);
+      continue;
+    }
+
+    for (let i = 0; i <= duration; i++) {
+      days.add(addDays(cycle.start_date, i));
+    }
+  }
+
+  return days;
+}
+
+function getPredictedDays(prediction) {
+  const days = new Set();
+
+  if (!prediction.available || prediction.overdue) {
+    return days;
+  }
+
+  const count = daysBetween(
+    prediction.windowStart,
+    prediction.windowEnd
   );
+
+  for (let i = 0; i <= count; i++) {
+    days.add(addDays(prediction.windowStart, i));
+  }
+
+  return days;
+}
+
+export default function CycleCalendar({ onOpenJournal }) {
+  const [viewDate, setViewDate] = useState(
+    () => new Date()
+  );
+  const [selectedDate, setSelectedDate] = useState(
+    () => localToday()
+  );
+
   const [cycles, setCycles] = useState([]);
   const [logs, setLogs] = useState([]);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let active = true;
 
     async function loadData() {
       try {
-        const [savedCycles, savedLogs] = await Promise.all([
+        const [cycleData, logData] = await Promise.all([
           window.luna.getCycles(),
           window.luna.getDailyLogs(),
         ]);
 
-        if (active) {
-          setCycles(savedCycles);
-          setLogs(savedLogs);
-        }
+        if (!active) return;
+
+        setCycles(cycleData);
+        setLogs(logData);
       } catch (err) {
         if (active) setError(err.message);
+      } finally {
+        if (active) setLoading(false);
       }
     }
 
     loadData();
-    return () => { active = false; };
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   const year = viewDate.getFullYear();
@@ -93,102 +150,84 @@ export default function CycleCalendar({ onOpenJournal }) {
     [year, month]
   );
 
-  const periodDays = useMemo(() => {
-    const dates = new Set();
+  const periodDays = useMemo(
+    () => getPeriodDays(cycles),
+    [cycles]
+  );
 
-    for (const cycle of cycles) {
-      if (!cycle.end_date) {
-        // An unknown end date should not fill the
-        // entire calendar with period highlighting.
-        dates.add(cycle.start_date);
-        continue;
-      }
+  const prediction = useMemo(
+    () => calculatePrediction(cycles),
+    [cycles]
+  );
 
-      const duration = dayDifference(
-        cycle.start_date,
-        cycle.end_date
-      );
-
-      // Defensive limit against malformed records.
-      if (duration < 0 || duration > 30) continue;
-
-      for (let i = 0; i <= duration; i++) {
-        dates.add(addDays(cycle.start_date, i));
-      }
-    }
-
-    return dates;
-  }, [cycles]);
+  const predictedDays = useMemo(
+    () => getPredictedDays(prediction),
+    [prediction]
+  );
 
   const logMap = useMemo(
-    () => new Map(logs.map(log => [log.logDate, log])),
+    () => new Map(
+      logs.map(log => [log.logDate, log])
+    ),
     [logs]
   );
 
   const selectedLog = logMap.get(selectedDate);
+  const isRecordedPeriod = periodDays.has(selectedDate);
+
+  const isPredicted =
+    !isRecordedPeriod &&
+    predictedDays.has(selectedDate);
+
   const selectedCycle = cycles.find(cycle => {
-    if (cycle.start_date === selectedDate) return true;
-    return cycle.end_date &&
-      selectedDate >= cycle.start_date &&
-      selectedDate <= cycle.end_date;
-  });
-
-  const cycleLengths = useMemo(() => {
-    const sorted = [...cycles].sort((a, b) =>
-      a.start_date.localeCompare(b.start_date)
-    );
-
-    const lengths = [];
-
-    for (let i = 1; i < sorted.length; i++) {
-      const length = dayDifference(
-        sorted[i - 1].start_date,
-        sorted[i].start_date
-      );
-
-      if (length > 0) lengths.push(length);
+    if (cycle.start_date === selectedDate) {
+      return true;
     }
 
-    return lengths;
-  }, [cycles]);
-
-  const averageLength = cycleLengths.length
-    ? Math.round(
-        cycleLengths.reduce((sum, n) => sum + n, 0) /
-        cycleLengths.length
-      )
-    : null;
+    return Boolean(
+      cycle.end_date &&
+      selectedDate >= cycle.start_date &&
+      selectedDate <= cycle.end_date
+    );
+  });
 
   function changeMonth(offset) {
-    setViewDate(current =>
-      new Date(
-        current.getFullYear(),
-        current.getMonth() + offset,
-        1
-      )
-    );
+    setViewDate(current => new Date(
+      current.getFullYear(),
+      current.getMonth() + offset,
+      1
+    ));
   }
 
   function goToday() {
     const today = new Date();
     setViewDate(today);
-    setSelectedDate(toDateKey(today));
+    setSelectedDate(localToday());
   }
 
   function selectDay(day) {
     setSelectedDate(day.key);
 
     if (!day.currentMonth) {
-      setViewDate(parseDate(day.key));
+      setViewDate(parseLocalDate(day.key));
     }
   }
 
-  const monthTitle = viewDate.toLocaleDateString("en-IN", {
-    month: "long",
-    year: "numeric",
-  });
+  function goToPrediction() {
+    if (!prediction.available) return;
 
-  const todayKey = toDateKey(new Date());
+    setViewDate(parseLocalDate(
+      prediction.expectedDate
+    ));
+    setSelectedDate(prediction.expectedDate);
+  }
+
+  const monthTitle = viewDate.toLocaleDateString(
+    "en-IN",
+    { month: "long", year: "numeric" }
+  );
+
+  const todayKey = localToday();
 
   return (
     <div className="calendar-page">
@@ -197,7 +236,7 @@ export default function CycleCalendar({ onOpenJournal }) {
           <div>
             <h2>My Cycle Calendar 🌷</h2>
             <p className="calendar-subtitle">
-              A little overview of your cycle.
+              Your recorded days and estimated dates.
             </p>
           </div>
 
@@ -240,22 +279,34 @@ export default function CycleCalendar({ onOpenJournal }) {
           {calendarDays.map(day => {
             const isPeriod = periodDays.has(day.key);
             const hasLog = logMap.has(day.key);
-            const isSelected = day.key === selectedDate;
-            const isToday = day.key === todayKey;
+
+            const isEstimate =
+              !isPeriod &&
+              predictedDays.has(day.key);
+
+            const isSelected =
+              selectedDate === day.key;
+
+            const isToday =
+              todayKey === day.key;
 
             return (
               <button
-                key={day.key}
                 type="button"
-                aria-label={`${readableDate(day.key)}${
-                  isPeriod ? ", recorded period" : ""
-                }${hasLog ? ", daily log" : ""}`}
-                aria-pressed={isSelected}
+                key={day.key}
                 onClick={() => selectDay(day)}
+                aria-pressed={isSelected}
+                aria-label={
+                  `${readableDate(day.key)}` +
+                  (isPeriod ? ", recorded period" : "") +
+                  (isEstimate ? ", estimated period start window" : "") +
+                  (hasLog ? ", daily entry" : "")
+                }
                 className={[
                   "calendar-day",
                   !day.currentMonth ? "outside" : "",
                   isPeriod ? "period-day" : "",
+                  isEstimate ? "predicted-day" : "",
                   isSelected ? "selected-day" : "",
                   isToday ? "today-day" : "",
                 ].filter(Boolean).join(" ")}
@@ -272,39 +323,144 @@ export default function CycleCalendar({ onOpenJournal }) {
 
         <div className="calendar-legend">
           <span>
-            <i className="legend-period" /> Period
+            <i className="legend-period" />
+            Recorded period
           </span>
+
           <span>
-            <i className="legend-log" /> Daily entry
+            <i className="legend-predicted" />
+            Estimated start window
           </span>
+
           <span>
-            <i className="legend-today" /> Today
+            <i className="legend-log" />
+            Daily entry
+          </span>
+
+          <span>
+            <i className="legend-today" />
+            Today
           </span>
         </div>
+      </section>
+
+      <section className="panel">
+        <h2>Next Period Estimate 🌙</h2>
+
+        {loading ? (
+          <p>Loading cycle history...</p>
+        ) : !prediction.available ? (
+          <p className="calendar-empty">
+            {prediction.message}
+          </p>
+        ) : (
+          <>
+            <div className="prediction-highlight">
+              <p className="prediction-label">
+                Estimated start date
+              </p>
+
+              <h3>
+                {formatDate(prediction.expectedDate)}
+              </h3>
+
+              <p>
+                Possible start window:{" "}
+                <strong>
+                  {formatDate(prediction.windowStart)}
+                  {" – "}
+                  {formatDate(prediction.windowEnd)}
+                </strong>
+              </p>
+            </div>
+
+            <div className="calendar-stats">
+              <div className="calendar-stat">
+                <span>Typical cycle</span>
+                <strong>
+                  {prediction.average} days
+                </strong>
+              </div>
+
+              <div className="calendar-stat">
+                <span>Observed variation</span>
+                <strong>
+                  {prediction.variation} days
+                </strong>
+              </div>
+
+              <div className="calendar-stat">
+                <span>Intervals used</span>
+                <strong>
+                  {prediction.sampleSize}
+                </strong>
+              </div>
+            </div>
+
+            <p className="prediction-reliability">
+              {prediction.reliability}
+            </p>
+
+            {prediction.overdue && (
+              <p className="prediction-warning">
+                The estimated start window has passed.
+                This does not necessarily indicate a
+                problem. Your next period may arrive
+                later than expected.
+              </p>
+            )}
+
+            <button
+              type="button"
+              onClick={goToPrediction}
+            >
+              View estimated date
+            </button>
+          </>
+        )}
+
+        <p className="calendar-disclaimer">
+          This estimate uses recent recorded cycle
+          lengths. The displayed window is a heuristic,
+          not a medical confidence interval. Cycle
+          timing can change due to many factors.
+        </p>
       </section>
 
       <section className="panel selected-date-panel">
         <h2>{readableDate(selectedDate)}</h2>
 
-        {selectedCycle && (
+        {selectedCycle && isRecordedPeriod && (
           <p className="calendar-period-info">
             🌸 Recorded period day
-            {selectedCycle.start_date === selectedDate &&
-              " · Period started"}
+            {selectedCycle.start_date === selectedDate
+              ? " · Period started"
+              : ""}
+          </p>
+        )}
+
+        {isPredicted && (
+          <p className="prediction-reliability">
+            ✨ This date falls within the estimated
+            next-period start window. It is not a
+            confirmed period day.
           </p>
         )}
 
         {selectedLog ? (
           <div className="calendar-log-details">
             <p>
-              <strong>Flow:</strong> {selectedLog.flow}
+              <strong>Flow:</strong>{" "}
+              {selectedLog.flow}
             </p>
+
             <p>
               <strong>Moods:</strong>{" "}
               {selectedLog.moods.length
                 ? selectedLog.moods.join(", ")
                 : "Not recorded"}
             </p>
+
             <p>
               <strong>Symptoms:</strong>{" "}
               {selectedLog.symptoms.length
@@ -314,7 +470,8 @@ export default function CycleCalendar({ onOpenJournal }) {
 
             {selectedLog.notes && (
               <p className="calendar-notes">
-                <strong>Notes:</strong> {selectedLog.notes}
+                <strong>Notes:</strong>{" "}
+                {selectedLog.notes}
               </p>
             )}
           </div>
@@ -328,7 +485,9 @@ export default function CycleCalendar({ onOpenJournal }) {
           type="button"
           onClick={() => onOpenJournal(selectedDate)}
         >
-          {selectedLog ? "Edit daily entry" : "Log this day"}
+          {selectedLog
+            ? "Edit daily entry"
+            : "Log this day"}
         </button>
       </section>
 
@@ -342,25 +501,19 @@ export default function CycleCalendar({ onOpenJournal }) {
           </div>
 
           <div className="calendar-stat">
-            <span>Average cycle length</span>
-            <strong>
-              {averageLength !== null
-                ? `${averageLength} days`
-                : "Not enough data"}
-            </strong>
-          </div>
-
-          <div className="calendar-stat">
             <span>Daily entries</span>
             <strong>{logs.length}</strong>
           </div>
-        </div>
 
-        <p className="calendar-disclaimer">
-          Cycle length is measured from one period start
-          date to the next. Statistics are descriptive,
-          not predictions.
-        </p>
+          <div className="calendar-stat">
+            <span>Typical cycle length</span>
+            <strong>
+              {prediction.available
+                ? `${prediction.average} days`
+                : "Not available"}
+            </strong>
+          </div>
+        </div>
       </section>
 
       {error && (

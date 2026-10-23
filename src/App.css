@@ -1,4 +1,19 @@
 
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #fff9f7;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
 .app {
   min-height: 100vh;
   padding: 40px;
@@ -7,18 +22,18 @@
   color: #453b40;
 }
 
-header {
+.app-header {
   text-align: center;
   margin-bottom: 30px;
 }
 
-h1 {
+.app-header h1 {
   color: #a76e88;
   font-size: 42px;
   margin: 0;
 }
 
-header p {
+.app-header p {
   color: #8c7a83;
 }
 
@@ -31,7 +46,7 @@ header p {
   box-shadow: 0 4px 20px #0000000a;
 }
 
-h2 {
+.panel h2 {
   color: #5e6b49;
   margin-top: 0;
 }
@@ -49,11 +64,11 @@ label {
   font-weight: 500;
 }
 
-input, textarea {
+input,
+textarea {
   padding: 12px;
   border: 1px solid #ddd0d5;
   border-radius: 9px;
-  font: inherit;
 }
 
 textarea {
@@ -68,11 +83,37 @@ button {
   border-radius: 9px;
   padding: 12px 20px;
   cursor: pointer;
-  font: inherit;
 }
 
 button:hover {
   background: #a46882;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.app-nav {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 24px auto 32px;
+}
+
+.app-nav button {
+  background: #f2e8ed;
+  color: #806477;
+}
+
+.app-nav button:hover {
+  background: #ead8e1;
+}
+
+.app-nav button.active {
+  background: #b87c96;
+  color: white;
 }
 
 .cycle {
@@ -96,25 +137,6 @@ button:hover {
 
 .delete:hover {
   background: #edd0db;
-}
-
-/* Navigation */
-
-.app-nav {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin: 24px auto 32px;
-}
-
-.app-nav button {
-  background: #f2e8ed;
-  color: #806477;
-}
-
-.app-nav button.active {
-  background: #b87c96;
-  color: white;
 }
 
 /* Daily journal */
@@ -217,8 +239,6 @@ button:hover {
 .error-message {
   color: #b63f54;
 }
-
-/* History cards */
 
 .journal-history {
   display: flex;

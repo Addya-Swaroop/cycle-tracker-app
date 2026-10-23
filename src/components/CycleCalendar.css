@@ -92,8 +92,22 @@
   background: #e9bacd;
 }
 
+/* Estimated dates use a different appearance
+   from actual recorded period days. */
+
+.calendar-day.predicted-day {
+  background: #f4effb;
+  color: #81629e;
+  border: 2px dashed #c6addb;
+}
+
+.calendar-day.predicted-day:hover {
+  background: #ebe1f6;
+}
+
 .calendar-day.selected-day {
   border-color: #a96c88;
+  border-style: solid;
 }
 
 .calendar-day.today-day > span:first-child {
@@ -135,6 +149,12 @@
   background: #f2cfdd;
 }
 
+.legend-predicted {
+  border: 2px dashed #c6addb;
+  background: #f4effb;
+  border-radius: 3px;
+}
+
 .legend-log {
   border-radius: 50%;
   background: #82956b;
@@ -144,6 +164,49 @@
   border: 2px solid #a96c88;
   border-radius: 3px;
 }
+
+/* Prediction card */
+
+.prediction-highlight {
+  margin: 20px 0;
+  padding: 24px;
+  background: #f8f0f7;
+  border-radius: 16px;
+}
+
+.prediction-label {
+  color: #947b98;
+  font-size: 13px;
+  margin: 0 0 8px;
+}
+
+.prediction-highlight h3 {
+  font-size: 30px;
+  color: #8a608e;
+  margin: 0 0 12px;
+}
+
+.prediction-highlight p {
+  color: #826e85;
+  line-height: 1.6;
+}
+
+.prediction-reliability {
+  margin: 18px 0;
+  color: #81638c;
+  font-size: 14px;
+}
+
+.prediction-warning {
+  padding: 14px;
+  border-radius: 10px;
+  background: #fff3e6;
+  color: #946b3d;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* Selected date */
 
 .selected-date-panel h2 {
   margin-bottom: 16px;
@@ -172,6 +235,8 @@
   color: #9a8991;
   margin: 18px 0;
 }
+
+/* Statistics */
 
 .calendar-stats {
   display: grid;
@@ -223,5 +288,9 @@
 
   .calendar-header {
     flex-wrap: wrap;
+  }
+
+  .prediction-highlight h3 {
+    font-size: 24px;
   }
 }
