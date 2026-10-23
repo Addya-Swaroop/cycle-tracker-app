@@ -1,7 +1,30 @@
 
-const { contextBridge } = require("electron");
+const {
+  contextBridge,
+  ipcRenderer
+} = require("electron");
 
 contextBridge.exposeInMainWorld("luna", {
-  appName: "Luna",
-  platform: process.platform,
+  // Cycles
+  getCycles: () =>
+    ipcRenderer.invoke("cycles:get"),
+
+  addCycle: (data) =>
+    ipcRenderer.invoke("cycles:add", data),
+
+  updateCycle: (data) =>
+    ipcRenderer.invoke("cycles:update", data),
+
+  deleteCycle: (id) =>
+    ipcRenderer.invoke("cycles:delete", id),
+
+  // Daily journal
+  getDailyLogs: () =>
+    ipcRenderer.invoke("logs:get"),
+
+  saveDailyLog: (data) =>
+    ipcRenderer.invoke("logs:save", data),
+
+  deleteDailyLog: (id) =>
+    ipcRenderer.invoke("logs:delete", id),
 });

@@ -1,47 +1,285 @@
 
-.welcome {
+.app {
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  padding: 40px;
   background: #fff9f7;
   font-family: "Segoe UI", sans-serif;
-  text-align: center;
+  color: #453b40;
 }
 
-.flower {
-  font-size: 65px;
-  color: #b87c96;
+header {
+  text-align: center;
+  margin-bottom: 30px;
 }
 
 h1 {
-  font-size: 64px;
+  color: #a76e88;
+  font-size: 42px;
+  margin: 0;
+}
+
+header p {
+  color: #8c7a83;
+}
+
+.panel {
+  max-width: 750px;
+  margin: 20px auto;
+  padding: 28px;
+  background: white;
+  border-radius: 18px;
+  box-shadow: 0 4px 20px #0000000a;
+}
+
+h2 {
   color: #5e6b49;
-  margin: 10px 0;
+  margin-top: 0;
 }
 
-p {
-  font-size: 19px;
-  color: #755f6d;
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 
-span {
-  color: #998c93;
-  margin: 12px;
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-weight: 500;
+}
+
+input, textarea {
+  padding: 12px;
+  border: 1px solid #ddd0d5;
+  border-radius: 9px;
+  font: inherit;
+}
+
+textarea {
+  min-height: 80px;
+  resize: vertical;
 }
 
 button {
-  margin-top: 25px;
-  padding: 14px 40px;
-  border: none;
-  border-radius: 25px;
   background: #b87c96;
   color: white;
-  font-size: 16px;
+  border: none;
+  border-radius: 9px;
+  padding: 12px 20px;
   cursor: pointer;
+  font: inherit;
 }
 
 button:hover {
-  background: #a46983;
+  background: #a46882;
+}
+
+.cycle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding: 15px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.cycle p {
+  margin: 5px 0;
+  color: #82747b;
+}
+
+.delete {
+  background: #f4e4e9;
+  color: #a34464;
+}
+
+.delete:hover {
+  background: #edd0db;
+}
+
+/* Navigation */
+
+.app-nav {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 24px auto 32px;
+}
+
+.app-nav button {
+  background: #f2e8ed;
+  color: #806477;
+}
+
+.app-nav button.active {
+  background: #b87c96;
+  color: white;
+}
+
+/* Daily journal */
+
+.journal-page {
+  padding-bottom: 50px;
+}
+
+.journal-heading {
+  margin-bottom: 24px;
+}
+
+.journal-heading h2 {
+  margin-bottom: 8px;
+}
+
+.journal-heading p,
+.hint {
+  color: #92838a;
+  font-size: 14px;
+}
+
+.field-group {
+  margin: 12px 0;
+}
+
+.field-group h3 {
+  margin: 0 0 12px;
+  color: #65535d;
+  font-size: 16px;
+}
+
+.flow-options {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.choice {
+  background: #faf4f6;
+  color: #755f6b;
+  border: 1px solid #efdee5;
+  transition: 0.2s ease;
+}
+
+.choice:hover {
+  background: #f2e0e8;
+}
+
+.choice.selected {
+  background: #efd5e0;
+  color: #8b4967;
+  border-color: #bc819b;
+}
+
+.flow-choice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  padding: 15px 5px;
+  font-size: 12px;
+}
+
+.flow-icon {
+  font-size: 22px;
+}
+
+.chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.chip {
+  border-radius: 25px;
+  padding: 10px 15px;
+  font-size: 13px;
+  text-transform: capitalize;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.secondary-button {
+  background: #eee6e9;
+  color: #765d6a;
+}
+
+.secondary-button:hover {
+  background: #e7d8df;
+}
+
+.success-message {
+  color: #4b7855;
+}
+
+.error-message {
+  color: #b63f54;
+}
+
+/* History cards */
+
+.journal-history {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.log-card {
+  padding: 20px;
+  border: 1px solid #f0e4e9;
+  border-radius: 14px;
+  background: #fffbfc;
+}
+
+.log-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.flow-tag {
+  background: #f5e5eb;
+  color: #995f79;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  text-transform: capitalize;
+}
+
+.log-card p {
+  color: #756a70;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.log-notes {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.log-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.log-actions button {
+  padding: 9px 18px;
+}
+
+@media (max-width: 650px) {
+  .app {
+    padding: 20px 12px;
+  }
+
+  .panel {
+    padding: 18px;
+  }
+
+  .flow-options {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
