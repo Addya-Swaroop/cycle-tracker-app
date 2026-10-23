@@ -3,11 +3,13 @@ import { useEffect, useState } from "react";
 import DailyJournal from "./components/DailyJournal";
 import CycleCalendar from "./components/CycleCalendar";
 import InsightsDashboard from "./components/InsightsDashboard";
+import PrivacySettings from "./components/PrivacySettings";
 import "./App.css";
 
 function App() {
   const [page, setPage] = useState("cycles");
   const [journalDate, setJournalDate] = useState(null);
+  const [dataVersion, setDataVersion] = useState(0);
 
   const [cycles, setCycles] = useState([]);
   const [startDate, setStartDate] = useState("");
@@ -26,7 +28,12 @@ function App() {
 
   useEffect(() => {
     loadCycles();
-  }, []);
+  }, [dataVersion]);
+
+  function handleDataChanged() {
+    setDataVersion(version => version + 1);
+    setMessage("");
+  }
 
   function openJournal(date) {
     setJournalDate(date);
@@ -116,17 +123,32 @@ function App() {
         >
           Insights
         </button>
+
+        <button
+          type="button"
+          className={page === "privacy" ? "active" : ""}
+          onClick={() => navigateTo("privacy")}
+        >
+          Privacy & Data
+        </button>
       </nav>
 
       {page === "journal" ? (
         <DailyJournal
-          key={journalDate || "default"}
+          key={`${dataVersion}-${journalDate || "default"}`}
           initialDate={journalDate}
         />
       ) : page === "calendar" ? (
-        <CycleCalendar onOpenJournal={openJournal} />
+        <CycleCalendar
+          key={dataVersion}
+          onOpenJournal={openJournal}
+        />
       ) : page === "insights" ? (
-        <InsightsDashboard />
+        <InsightsDashboard key={dataVersion} />
+      ) : page === "privacy" ? (
+        <PrivacySettings
+          onDataChanged={handleDataChanged}
+        />
       ) : (
         <>
           <section className="panel">
@@ -139,7 +161,7 @@ function App() {
                   type="date"
                   required
                   value={startDate}
-                  onChange={(e) =>
+                  onChange={e =>
                     setStartDate(e.target.value)
                   }
                 />
@@ -151,7 +173,7 @@ function App() {
                   type="date"
                   min={startDate || undefined}
                   value={endDate}
-                  onChange={(e) =>
+                  onChange={e =>
                     setEndDate(e.target.value)
                   }
                 />
@@ -162,7 +184,7 @@ function App() {
                 <textarea
                   maxLength={5000}
                   value={notes}
-                  onChange={(e) =>
+                  onChange={e =>
                     setNotes(e.target.value)
                   }
                   placeholder="Anything you'd like to remember?"
@@ -185,7 +207,7 @@ function App() {
             {cycles.length === 0 ? (
               <p>No periods recorded yet.</p>
             ) : (
-              cycles.map((cycle) => (
+              cycles.map(cycle => (
                 <div className="cycle" key={cycle.id}>
                   <div>
                     <strong>{cycle.start_date}</strong>
