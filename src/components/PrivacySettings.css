@@ -1,151 +1,292 @@
+/* Luna — Privacy & Data
+   Dedicated styles. Uses the shared App.css theme variables.
+   No changes to PrivacySettings.jsx or data operations required.
+*/
 
 .privacy-page {
+  --privacy-card-bg: var(--surface, #fff);
+  --privacy-subtle-bg: var(--surface-soft, #fffbfc);
+  --privacy-text: var(--text, #453b40);
+  --privacy-muted: var(--text-muted, #8c7a83);
+  --privacy-border: var(--border, #eee2e7);
+  --privacy-rose: var(--accent, #b87c96);
+  --privacy-rose-soft: var(--accent-soft, #f2e8ed);
+  --privacy-rose-text: var(--accent-text, #806477);
   max-width: 1100px;
   margin: 0 auto;
-  padding-bottom: 50px;
+  padding-bottom: 52px;
+  color: var(--privacy-text);
 }
 
-.privacy-intro h2 {
-  color: #765469;
-  margin-bottom: 10px;
+/* Intro */
+.privacy-page .privacy-intro {
+  position: relative;
+  overflow: hidden;
+  padding: 30px 34px;
+  border: 1px solid var(--privacy-border);
+  background: var(--privacy-card-bg);
 }
-
-.privacy-intro p {
-  color: #8c7c84;
-  line-height: 1.7;
+.privacy-intro::after {
+  content: "✦";
+  position: absolute;
+  right: 34px;
+  top: 27px;
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  border-radius: 20px;
+  background: var(--privacy-rose-soft);
+  color: var(--privacy-rose);
+  font-size: 32px;
+  pointer-events: none;
 }
-
 .privacy-eyebrow {
-  color: #a87d94 !important;
+  margin: 0 0 11px;
+  color: var(--privacy-rose) !important;
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 2px;
+  font-weight: 750;
+  letter-spacing: 1.9px;
+}
+.privacy-page .privacy-intro h2 {
+  margin: 0 85px 10px 0;
+  color: var(--heading, #5e6b49);
+  font-size: clamp(23px, 3vw, 29px);
+  line-height: 1.25;
+  letter-spacing: -.5px;
+}
+.privacy-page .privacy-intro > p:last-child {
+  max-width: 640px;
+  margin: 0;
+  color: var(--privacy-muted);
+  font-size: 14px;
+  line-height: 1.75;
 }
 
+/* Four primary actions */
 .privacy-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 20px;
+  align-items: stretch;
+  gap: 18px;
   margin: 22px 0;
 }
-
 .privacy-card {
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  align-items: stretch;
   padding: 26px;
-  background: white;
-  border: 1px solid #f0e5e9;
+  border: 1px solid var(--privacy-border);
   border-radius: 18px;
-  box-shadow: 0 4px 18px #00000006;
+  background: var(--privacy-card-bg);
+  box-shadow: var(--shadow, 0 4px 20px #0000000a);
+  transition: border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease, background-color 200ms ease;
 }
-
+.privacy-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--privacy-rose);
+  box-shadow: 0 10px 28px #0000000c;
+}
 .privacy-card-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 52px;
-  height: 52px;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  margin-bottom: 17px;
   border-radius: 15px;
-  background: #f8edf2;
-  font-size: 25px;
+  background: var(--privacy-rose-soft);
+  font-size: 23px;
+  line-height: 1;
 }
-
 .privacy-card h3 {
-  margin: 0;
-  color: #77596a;
-  font-size: 19px;
+  margin: 0 0 9px;
+  color: var(--privacy-text);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.4;
 }
-
-.privacy-card p {
-  margin: 0;
-  color: #8e7e86;
-  font-size: 14px;
-  line-height: 1.7;
-  flex: 1;
-}
-
-.privacy-card label {
-  color: #78636e;
+.privacy-card > p {
+  margin: 0 0 20px;
+  color: var(--privacy-muted);
   font-size: 13px;
+  line-height: 1.75;
 }
-
+.privacy-card label,
+.privacy-danger label {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-top: auto;
+  color: var(--privacy-text);
+  font-size: 12px;
+  font-weight: 650;
+}
 .privacy-card input,
 .privacy-danger input {
+  box-sizing: border-box;
   width: 100%;
-  background: #fffdfd;
+  min-width: 0;
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--input-border, #ddd0d5);
+  border-radius: 11px;
+  outline: none;
+  background: var(--privacy-subtle-bg);
+  color: var(--privacy-text);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 400;
+  transition: border-color 180ms ease, box-shadow 180ms ease;
 }
-
-.privacy-card button {
-  width: 100%;
+.privacy-card input::placeholder,
+.privacy-danger input::placeholder { color: var(--privacy-muted); opacity: .75; }
+.privacy-card input:focus,
+.privacy-danger input:focus {
+  border-color: var(--privacy-rose);
+  box-shadow: 0 0 0 3px var(--privacy-rose-soft);
 }
+.privacy-page input:disabled { opacity: .6; cursor: not-allowed; }
 
+/* Button placement is consistent, even when card copy has different lengths. */
+.privacy-card > button,
+.privacy-danger > button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-start;
+  min-height: 43px;
+  margin-top: 18px;
+  padding: 11px 19px;
+  border: 1px solid transparent;
+  border-radius: 11px;
+  background: var(--privacy-rose);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.3;
+  cursor: pointer;
+  transition: background-color 180ms ease, transform 180ms ease, opacity 180ms ease;
+}
+.privacy-card > button:hover:not(:disabled) {
+  background: var(--accent-hover, #a46882);
+  transform: translateY(-1px);
+}
+.privacy-card > button:active:not(:disabled) { transform: translateY(0); }
+.privacy-card > button:disabled,
+.privacy-danger > button:disabled { opacity: .48; cursor: not-allowed; }
+.privacy-card > button:focus-visible,
+.privacy-danger > button:focus-visible { outline: 3px solid var(--privacy-rose-soft); outline-offset: 3px; }
+
+/* Inline warnings for unencrypted JSON */
 .privacy-notice {
-  padding: 13px;
-  border-radius: 10px;
-  background: #fff5eb;
-  color: #947148;
+  margin-top: auto;
+  padding: 13px 15px;
+  border: 1px solid var(--privacy-border);
+  border-radius: 11px;
+  background: var(--privacy-rose-soft);
+  color: var(--privacy-rose-text);
   font-size: 12px;
+  line-height: 1.65;
+}
+
+/* Destructive actions — clearly separated from routine data management */
+.privacy-page .privacy-danger {
+  padding: 27px 30px;
+  border: 1px solid var(--privacy-danger-border, #e9cbd5);
+  border-radius: 18px;
+  background: var(--privacy-danger-bg, #fff8f9);
+}
+.privacy-danger h2 {
+  margin: 0 0 10px;
+  color: var(--privacy-danger-title, #a34464);
+  font-size: 20px;
+  font-weight: 700;
+}
+.privacy-danger > p {
+  max-width: 790px;
+  margin: 0 0 10px;
+  color: var(--privacy-muted);
+  font-size: 13px;
+  line-height: 1.75;
+}
+.privacy-danger label { max-width: 430px; margin-top: 22px; }
+.privacy-danger > .privacy-delete-button {
+  background: var(--privacy-danger-button, #ae4f6b);
+  color: #fff;
+}
+.privacy-danger > .privacy-delete-button:hover:not(:disabled) {
+  background: var(--privacy-danger-button-hover, #913c56);
+  transform: translateY(-1px);
+}
+
+/* Feedback and transparency information */
+.privacy-page .privacy-success,
+.privacy-page .privacy-error {
+  margin: 0;
+  padding: 13px 15px;
+  border-radius: 11px;
+  font-size: 13px;
   line-height: 1.6;
 }
-
-.privacy-danger {
-  border: 1px solid #efd2d9;
+.privacy-page .privacy-success {
+  background: var(--privacy-success-bg, #edf4e9);
+  color: var(--privacy-success-text, #526c48);
 }
-
-.privacy-danger h2 {
-  color: #a34e65;
+.privacy-page .privacy-error {
+  background: var(--danger-bg, #f4e4e9);
+  color: var(--danger-text, #a34464);
 }
-
-.privacy-danger p {
-  color: #897680;
-  line-height: 1.7;
+.privacy-page .privacy-footer {
+  margin-top: 22px;
+  padding: 25px 30px;
+  border: 1px solid var(--privacy-border);
+  background: var(--privacy-card-bg);
 }
-
-.privacy-danger label {
-  margin: 20px 0 14px;
-  color: #8b5968;
-}
-
-.privacy-delete-button {
-  background: #b74e68;
-}
-
-.privacy-delete-button:hover {
-  background: #9e3952;
-}
-
-.privacy-delete-button:disabled {
-  background: #d8b4bf;
-}
-
-.privacy-success {
-  color: #547b5a;
-  font-weight: 600;
-}
-
-.privacy-error {
-  color: #b63f54;
-  font-weight: 600;
-}
-
 .privacy-footer h3 {
-  color: #765469;
+  margin: 0 0 12px;
+  color: var(--heading, #5e6b49);
+  font-size: 16px;
 }
-
 .privacy-footer p {
-  color: #8d7c85;
-  line-height: 1.7;
-  font-size: 13px;
+  margin: 0 0 10px;
+  color: var(--privacy-muted);
+  font-size: 12px;
+  line-height: 1.8;
 }
+.privacy-footer p:last-child { margin-bottom: 0; }
 
-@media (max-width: 750px) {
-  .privacy-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .privacy-card {
-    padding: 20px;
-  }
+/* Dark-only accents: the cards and text inherit Luna's shared theme tokens. */
+:root[data-theme="dark"] .privacy-page {
+  --privacy-danger-bg: #2f2530;
+  --privacy-danger-border: #614052;
+  --privacy-danger-title: #f0b5cb;
+  --privacy-danger-button: #aa5775;
+  --privacy-danger-button-hover: #bf6b89;
+  --privacy-success-bg: #29382f;
+  --privacy-success-text: #b8d6b1;
 }
+:root[data-theme="dark"] .privacy-card:hover { box-shadow: 0 10px 28px #0000002b; }
+:root[data-theme="dark"] .privacy-card > button,
+:root[data-theme="dark"] .privacy-danger > button { color: #19151b; }
+:root[data-theme="dark"] .privacy-card > button:disabled,
+:root[data-theme="dark"] .privacy-danger > button:disabled { color: #fff; }
 
+@media (max-width: 760px) {
+  .privacy-grid { grid-template-columns: 1fr; }
+  .privacy-card { padding: 23px; }
+}
+@media (max-width: 520px) {
+  .privacy-page .privacy-intro { padding: 23px 20px; }
+  .privacy-intro::after { width: 43px; height: 43px; top: 19px; right: 18px; border-radius: 13px; font-size: 23px; }
+  .privacy-page .privacy-intro h2 { margin-right: 55px; font-size: 23px; }
+  .privacy-grid { gap: 13px; margin: 16px 0; }
+  .privacy-card { padding: 21px; }
+  .privacy-page .privacy-danger, .privacy-page .privacy-footer { padding: 22px 20px; }
+  .privacy-card > button, .privacy-danger > button { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .privacy-card, .privacy-card > button, .privacy-danger > button, .privacy-card input, .privacy-danger input { transition: none; }
+  .privacy-card:hover, .privacy-card > button:hover:not(:disabled), .privacy-danger > button:hover:not(:disabled) { transform: none; }
+}
