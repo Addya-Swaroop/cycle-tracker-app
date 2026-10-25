@@ -109,6 +109,7 @@ export default function CycleCalendar({ onOpenJournal }) {
     () => localToday()
   );
 
+  const [monthDirection, setMonthDirection] = useState("forward");
   const [cycles, setCycles] = useState([]);
   const [logs, setLogs] = useState([]);
   const [error, setError] = useState("");
@@ -192,6 +193,7 @@ export default function CycleCalendar({ onOpenJournal }) {
   });
 
   function changeMonth(offset) {
+    setMonthDirection(offset < 0 ? "backward" : "forward");
     setViewDate(current => new Date(
       current.getFullYear(),
       current.getMonth() + offset,
@@ -201,6 +203,7 @@ export default function CycleCalendar({ onOpenJournal }) {
 
   function goToday() {
     const today = new Date();
+    setMonthDirection(today < viewDate ? "backward" : "forward");
     setViewDate(today);
     setSelectedDate(localToday());
   }
@@ -209,6 +212,7 @@ export default function CycleCalendar({ onOpenJournal }) {
     setSelectedDate(day.key);
 
     if (!day.currentMonth) {
+      setMonthDirection(day.key < `${year}-${String(month + 1).padStart(2, "0")}-01` ? "backward" : "forward");
       setViewDate(parseLocalDate(day.key));
     }
   }
@@ -216,6 +220,7 @@ export default function CycleCalendar({ onOpenJournal }) {
   function goToPrediction() {
     if (!prediction.available) return;
 
+    setMonthDirection(prediction.expectedDate < `${year}-${String(month + 1).padStart(2, "0")}-01` ? "backward" : "forward");
     setViewDate(parseLocalDate(
       prediction.expectedDate
     ));
@@ -269,7 +274,10 @@ export default function CycleCalendar({ onOpenJournal }) {
           </button>
         </div>
 
-        <div className="calendar-grid">
+        <div
+          className={`calendar-grid calendar-grid-motion calendar-motion-${monthDirection}`}
+          key={`${year}-${month}`}
+        >
           {WEEKDAYS.map(day => (
             <div className="weekday" key={day}>
               {day}
@@ -427,7 +435,7 @@ export default function CycleCalendar({ onOpenJournal }) {
         </p>
       </section>
 
-      <section className="panel selected-date-panel">
+      <section className="panel selected-date-panel" key={`selected-${selectedDate}`}>
         <h2>{readableDate(selectedDate)}</h2>
 
         {selectedCycle && isRecordedPeriod && (
