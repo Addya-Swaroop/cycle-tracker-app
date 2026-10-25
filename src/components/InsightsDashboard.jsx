@@ -20,8 +20,8 @@ const COLORS = {
   olive: "#788B65",
   lavender: "#9C83B8",
   peach: "#D7A27D",
-  grid: "#EFE6EA",
-  text: "#84717B",
+  grid: "var(--insights-grid)",
+  text: "var(--insights-chart-text)",
 };
 
 function titleCase(value) {
@@ -264,6 +264,9 @@ export default function InsightsDashboard() {
                 tick={{ fill: COLORS.text, fontSize: 11 }}
               />
               <Tooltip
+                contentStyle={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10, color: "var(--text)" }}
+                labelStyle={{ color: "var(--text)" }}
+                itemStyle={{ color: "var(--text)" }}
                 formatter={value => [
                   `${value} days`,
                   "Cycle length",
@@ -315,6 +318,9 @@ export default function InsightsDashboard() {
                 tick={{ fill: COLORS.text, fontSize: 11 }}
               />
               <Tooltip
+                contentStyle={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10, color: "var(--text)" }}
+                labelStyle={{ color: "var(--text)" }}
+                itemStyle={{ color: "var(--text)" }}
                 formatter={value => [
                   `${value} days`,
                   "Period duration",
@@ -364,7 +370,7 @@ export default function InsightsDashboard() {
                 width={115}
                 tick={{ fill: COLORS.text, fontSize: 11 }}
               />
-              <Tooltip />
+              <Tooltip contentStyle={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10, color: "var(--text)" }} labelStyle={{ color: "var(--text)" }} itemStyle={{ color: "var(--text)" }} />
               <Bar
                 dataKey="count"
                 name="Logged days"
@@ -405,7 +411,7 @@ export default function InsightsDashboard() {
                 allowDecimals={false}
                 tick={{ fill: COLORS.text, fontSize: 11 }}
               />
-              <Tooltip />
+              <Tooltip contentStyle={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10, color: "var(--text)" }} labelStyle={{ color: "var(--text)" }} itemStyle={{ color: "var(--text)" }} />
               <Bar
                 dataKey="count"
                 name="Logged days"
@@ -446,7 +452,7 @@ export default function InsightsDashboard() {
                 allowDecimals={false}
                 tick={{ fill: COLORS.text, fontSize: 11 }}
               />
-              <Tooltip />
+              <Tooltip contentStyle={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10, color: "var(--text)" }} labelStyle={{ color: "var(--text)" }} itemStyle={{ color: "var(--text)" }} />
               <Bar
                 dataKey="count"
                 name="Logged days"
@@ -484,7 +490,7 @@ export default function InsightsDashboard() {
                 allowDecimals={false}
                 tick={{ fill: COLORS.text, fontSize: 11 }}
               />
-              <Tooltip />
+              <Tooltip contentStyle={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10, color: "var(--text)" }} labelStyle={{ color: "var(--text)" }} itemStyle={{ color: "var(--text)" }} />
               <Line
                 type="monotone"
                 dataKey="count"
